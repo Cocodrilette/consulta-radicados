@@ -3,3 +3,5 @@
 .pki
 .python_history
 .ash_history
+
+__pycache__

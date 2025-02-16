@@ -1,5 +1,5 @@
 # Use Python Alpine
-FROM python:3.14.0a5-alpine3.21
+FROM python:3.11-alpine
 
 # Set environment variables for Chromium
 ENV CHROME_BIN=/usr/bin/chromium-browser
