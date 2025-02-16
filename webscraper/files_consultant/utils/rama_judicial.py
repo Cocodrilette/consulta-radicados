@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from utils.scrapper.driver import driver
+from files_consultant.utils.driver import driver
 
 
 def get_radicados_data():
@@ -43,6 +43,7 @@ def get_radicados_data():
     # Obtener todas las filas de la tabla
     filas = tabla.find_elements(By.XPATH, ".//tbody/tr")
 
+    fechas_apertura = []
     fechas = []
     despachos = []
     sujetos_columna = []
@@ -52,6 +53,11 @@ def get_radicados_data():
         try:
             # Buscar el `td` correspondiente a la columna
             columna_fecha = fila.find_element(By.XPATH, ".//td[@class='text-center']")
+
+            # Extraer la fecha de apertura
+            fecha_apertura = columna_fecha.find_element(By.XPATH, "following-sibling::td//div").text
+            fechas_apertura.append(fecha_apertura)
+
             # Buscar el segundo botón dentro de la fila
             boton = columna_fecha.find_element(By.XPATH, "following-sibling::td//button")
             # Extraer el span dentro del botón (contiene la fecha)
@@ -69,6 +75,10 @@ def get_radicados_data():
             sujetos_columna.append(sujeto)
         except Exception as e:
             print(f"⚠️ Error extrayendo fecha en una fila: {e}")
+
+    print("📅 Fechas de apertura encontradas en la columna:")
+    for fecha in fechas_apertura:
+        print(f" - {fecha}")
 
     # Imprimir los resultados
     print("📅 Fechas encontradas en la columna:")
