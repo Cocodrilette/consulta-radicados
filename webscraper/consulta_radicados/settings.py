@@ -42,6 +42,11 @@ INSTALLED_APPS = [
 ]
 
 INSTALLED_APPS += [
+    'files_consultant',
+]
+
+
+INSTALLED_APPS += [
   'rest_framework',
 ]
 
