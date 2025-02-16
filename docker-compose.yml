@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .
+    container_name: webscraper
+    command: python manage.py runserver 0:8000
+    volumes:
+      - .:/home/app
+    working_dir: /home/app/webscraper
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    image: postgres:17
+    container_name: webscraper_db
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5436:5432"
+
+volumes:
+  postgres_data:
