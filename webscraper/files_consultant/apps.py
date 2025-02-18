@@ -6,5 +6,4 @@ class FilesConsultantConfig(AppConfig):
     name = 'files_consultant'
 
     def ready(self):
-        print("FilesConsultantConfig ready")
         import files_consultant.signals  # noqa
