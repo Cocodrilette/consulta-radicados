@@ -1,4 +1,6 @@
+import re
 import time
+from dataclasses import dataclass
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from files_consultant.utils.driver import driver
 
 
+@dataclass
 class RadicadoData:
     def __init__(self, open_date, last_update_date, office, legal_parties_str):
         self.open_date = open_date
@@ -16,6 +19,15 @@ class RadicadoData:
 
     def __str__(self):
         return f"Open Date: {self.open_date}\nLast Update Date: {self.last_update_date}\nOffice: {self.office}\nLegal Parties: {self.legal_parties_str}"
+
+@dataclass
+class LegalParties:
+    plaintiff: str
+    defendant: str
+    procurator: str
+
+    def __str__(self):
+        return f"Plaintiff: {self.plaintiff}\nDefendant: {self.defendant}\nProcurator: {self.procurator}"
 
 
 def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
@@ -74,5 +86,24 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
         except Exception as e:
             print(f"⚠️ Error extracting data for radicado number {radicado_number}: {e}")
 
-    driver.quit()
     return radicado_data_list
+
+
+def extract_legal_parties(texto: str) -> LegalParties:
+    """
+    Extrae los involucrados de un texto con formato 'Rol: Nombre' y los retorna en una clase.
+    
+    Args:
+        texto (str): Texto con los involucrados.
+    
+    Returns:
+        Involucrados: Objeto con los datos estructurados.
+    """
+    pattern = r"([^:\n]+):\s*(.+)"
+    matches = dict(re.findall(pattern, texto))
+
+    return LegalParties(
+        plaintiff=matches.get("Demandante", None),
+        defendant=matches.get("Demandado", None),
+        procurator=matches.get("Procurador", None)
+    )

@@ -4,6 +4,7 @@
 .python_history
 .ash_history
 core
+.wdm
 
 __pycache__
 **/__pycache__/

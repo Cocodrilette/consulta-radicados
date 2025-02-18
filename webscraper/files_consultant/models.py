@@ -4,9 +4,9 @@ from django.db import models
 class Process(models.Model):
     file_number = models.CharField(max_length=20, unique=True)
     open_date = models.DateField(null=True, blank=True)
-    plaintiff = models.CharField(max_length=100, null=True, blank=True)
-    defendant = models.CharField(max_length=100, null=True, blank=True)
-    procurator = models.CharField(max_length=100, null=True, blank=True)
+    plaintiff = models.CharField(max_length=100, null=True, blank=True, help_text="Demandante")
+    defendant = models.CharField(max_length=100, null=True, blank=True, help_text="Demandado")
+    procurator = models.CharField(max_length=100, null=True, blank=True, help_text="Procurador")
 
     def __str__(self):
         return self.file_number
