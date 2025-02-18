@@ -7,91 +7,72 @@ from selenium.webdriver.support.ui import WebDriverWait
 from files_consultant.utils.driver import driver
 
 
-def get_radicados_data():
-    # Abrir una página
+class RadicadoData:
+    def __init__(self, open_date, last_update_date, office, legal_parties_str):
+        self.open_date = open_date
+        self.last_update_date = last_update_date
+        self.office = office
+        self.legal_parties_str = legal_parties_str
+
+    def __str__(self):
+        return f"Open Date: {self.open_date}\nLast Update Date: {self.last_update_date}\nOffice: {self.office}\nLegal Parties: {self.legal_parties_str}"
+
+
+def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
     url = "https://consultaprocesos.ramajudicial.gov.co/Procesos/NumeroRadicacion"
     driver.get(url)
 
-    # Esperar que los radio buttons sean visibles
     wait = WebDriverWait(driver, 10)
-    # Encontrar todos los radio buttons
     radio_buttons = wait.until(EC.presence_of_all_elements_located((By.XPATH, "//input[@role='radio']")))
 
-    # Seleccionar el segundo radio button con JavaScript
     if len(radio_buttons) > 1:
         driver.execute_script("arguments[0].click();", radio_buttons[1])
-        print("✅ Segundo radio button seleccionado correctamente.")
+        print("✅ Second radio button selected successfully.")
     else:
-        print("❌ No se encontraron suficientes radio buttons.")
+        raise Exception("Not enough radio buttons found.")
 
-    # Esperar el campo de entrada por su placeholder
     input_field = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Ingrese los 23 dígitos del número de Radicación']")))
 
-    # Asignar el número de radicación
-    numero_radicacion = "05001233300020210212000"  # Ingresa aquí el número que desees
-    input_field.send_keys(numero_radicacion)
-    print("✅ Número de radicación ingresado correctamente.")
+    radicado_data_list = []
 
-    # Esperar el botón de "Consultar" y hacer clic
-    consultar_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Consultar Número de radicación']")))
-    consultar_button.click()
-    print("✅ Botón 'Consultar' clickeado correctamente.")
+    for index, radicado_number in enumerate(radicado_numbers):
+        print(f"🔍 Searching for radicado number {radicado_number}...")
 
-    # Esperar a que la tabla cargue
-    tabla = wait.until(EC.presence_of_element_located((By.XPATH, "//th[@aria-label='Fecha de Radicación y última actuación']/ancestor::table")))
+        input_field.clear()
+        input_field.send_keys(radicado_number)
+        print(f"✅ Radicado number {radicado_number} entered successfully.")
 
-    # Obtener todas las filas de la tabla
-    filas = tabla.find_elements(By.XPATH, ".//tbody/tr")
-
-    fechas_apertura = []
-    fechas = []
-    despachos = []
-    sujetos_columna = []
-
-    # Recorrer cada fila para extraer la fecha
-    for fila in filas:
+        consult_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Consultar Número de radicación']")))
+        driver.execute_script("arguments[0].scrollIntoView(true);", consult_button)
+        # Add a small delay to ensure the page has settled
+        time.sleep(0.5)
+        # Try JavaScript click if regular click fails
         try:
-            # Buscar el `td` correspondiente a la columna
-            columna_fecha = fila.find_element(By.XPATH, ".//td[@class='text-center']")
+            consult_button.click()
+        except:
+            driver.execute_script("arguments[0].click();", consult_button)
+        print("✅ 'Consult' button clicked successfully.")
 
-            # Extraer la fecha de apertura
-            fecha_apertura = columna_fecha.find_element(By.XPATH, "following-sibling::td//div").text
-            fechas_apertura.append(fecha_apertura)
+        table = wait.until(EC.presence_of_element_located((By.XPATH, "//th[@aria-label='Fecha de Radicación y última actuación']/ancestor::table")))
 
-            # Buscar el segundo botón dentro de la fila
-            boton = columna_fecha.find_element(By.XPATH, "following-sibling::td//button")
-            # Extraer el span dentro del botón (contiene la fecha)
-            fecha = boton.find_element(By.XPATH, ".//span").text
-            fechas.append(fecha)
+        try:
+            row = table.find_element(By.XPATH, ".//tbody/tr[1]")
 
-            # Buscar el `td` siguiente al que contiene el botón
-            despacho_columna = boton.find_element(By.XPATH, "ancestor::td/following-sibling::td")
-            despacho = despacho_columna.find_element(By.XPATH, ".//div").text
-            despachos.append(despacho)
-            
-            # Buscar el `td` siguiente al que contiene el despacho
-            sujeto_columna = despacho_columna.find_element(By.XPATH, "following-sibling::td")
-            sujeto = sujeto_columna.find_element(By.XPATH, ".//div").text
-            sujetos_columna.append(sujeto)
+            date_column = row.find_element(By.XPATH, ".//td[@class='text-center']")
+            open_date = date_column.find_element(By.XPATH, "following-sibling::td//div").text
+
+            button = date_column.find_element(By.XPATH, "following-sibling::td//button")
+            last_update_date = button.find_element(By.XPATH, ".//span").text
+
+            office_column = button.find_element(By.XPATH, "ancestor::td/following-sibling::td")
+            office = office_column.find_element(By.XPATH, ".//div").text
+
+            legal_parties_column = office_column.find_element(By.XPATH, "following-sibling::td")
+            legal_parties = legal_parties_column.find_element(By.XPATH, ".//div").text
+
+            radicado_data_list.append(RadicadoData(open_date, last_update_date, office, legal_parties))
         except Exception as e:
-            print(f"⚠️ Error extrayendo fecha en una fila: {e}")
+            print(f"⚠️ Error extracting data for radicado number {radicado_number}: {e}")
 
-    print("📅 Fechas de apertura encontradas en la columna:")
-    for fecha in fechas_apertura:
-        print(f" - {fecha}")
-
-    # Imprimir los resultados
-    print("📅 Fechas encontradas en la columna:")
-    for fecha in fechas:
-        print(f" - {fecha}")
-
-    print("🏛️ Despachos encontrados en la columna:")
-    for despacho in despachos:
-        print(f" - {despacho}")
-
-    print("👥 Sujetos encontrados en la columna:")
-    for sujeto in sujetos_columna:
-        print(f" - {sujeto}")
-
-    # Cerrar el navegador
     driver.quit()
+    return radicado_data_list
