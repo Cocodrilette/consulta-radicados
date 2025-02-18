@@ -3,6 +3,7 @@
 .pki
 .python_history
 .ash_history
+core
 
 __pycache__
 **/__pycache__/
