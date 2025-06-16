@@ -18,23 +18,33 @@ def fetch_process_data(sender, instance, created, **kwargs):
         try:
             # Get data from Rama Judicial
             radicado_data_list = rama_judicial_utils.get_radicado_data(
-                [instance.file_number])
+                [instance.file_number]
+            )
             print(
-                f"Data fetched for process {instance.file_number}: {radicado_data_list}")
+                f"Data fetched for process {instance.file_number}: {radicado_data_list}"
+            )
 
             if radicado_data_list and len(radicado_data_list) > 0:
                 radicado_data = radicado_data_list[0]
 
                 # Update Process instance
                 instance.open_date = datetime.strptime(
-                    radicado_data.open_date, '%Y-%m-%d').date()
+                    radicado_data.open_date, "%Y-%m-%d"
+                ).date()
 
                 # Extract plaintiff and defendant from legal_parties_str
                 parties = rama_judicial_utils.extract_legal_parties(
-                    radicado_data.legal_parties_str)
-                instance.plaintiff = parties.plaintiff.title() if parties.plaintiff else None
-                instance.defendant = parties.defendant.title() if parties.defendant else None
-                instance.procurator = parties.procurator.title() if parties.procurator else None
+                    radicado_data.legal_parties_str
+                )
+                instance.plaintiff = (
+                    parties.plaintiff.title() if parties.plaintiff else None
+                )
+                instance.defendant = (
+                    parties.defendant.title() if parties.defendant else None
+                )
+                instance.procurator = (
+                    parties.procurator.title() if parties.procurator else None
+                )
 
                 # Save the updated Process instance
                 instance.save()
@@ -43,11 +53,10 @@ def fetch_process_data(sender, instance, created, **kwargs):
                 files_consultant_models.ProcessSnapshot.objects.create(
                     process=instance,
                     last_update=datetime.strptime(
-                        f"{radicado_data.last_update_date}", '%Y-%m-%d'),
+                        f"{radicado_data.last_update_date}", "%Y-%m-%d"
+                    ),
                 )
-                print(
-                    f"ProcessSnapshot created for process {instance.file_number}")
+                print(f"ProcessSnapshot created for process {instance.file_number}")
 
         except Exception as e:
-            print(
-                f"Error fetching data for process {instance.file_number}: {e}")
+            print(f"Error fetching data for process {instance.file_number}: {e}")

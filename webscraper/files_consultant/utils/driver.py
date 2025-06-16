@@ -8,10 +8,12 @@ chrome_options.add_argument("--headless")  # Run without UI
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
+
 # Explicitly specify Chromium's driver path
 def get_driver():
     service = Service("/usr/bin/chromedriver")
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
+
 
 driver = get_driver()

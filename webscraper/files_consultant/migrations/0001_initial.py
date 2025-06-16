@@ -5,31 +5,66 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Process',
+            name="Process",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file_number', models.CharField(max_length=100, unique=True)),
-                ('open_date', models.DateField(blank=True, null=True)),
-                ('plaintiff', models.CharField(blank=True, help_text='Demandante', max_length=300, null=True)),
-                ('defendant', models.CharField(blank=True, help_text='Demandado', max_length=300, null=True)),
-                ('procurator', models.CharField(blank=True, help_text='Procurador', max_length=300, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file_number", models.CharField(max_length=100, unique=True)),
+                ("open_date", models.DateField(blank=True, null=True)),
+                (
+                    "plaintiff",
+                    models.CharField(
+                        blank=True, help_text="Demandante", max_length=300, null=True
+                    ),
+                ),
+                (
+                    "defendant",
+                    models.CharField(
+                        blank=True, help_text="Demandado", max_length=300, null=True
+                    ),
+                ),
+                (
+                    "procurator",
+                    models.CharField(
+                        blank=True, help_text="Procurador", max_length=300, null=True
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ProcessSnapshot',
+            name="ProcessSnapshot",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('snapshot_date', models.DateField(auto_now_add=True)),
-                ('last_update', models.DateTimeField()),
-                ('process', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='files_consultant.process')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("snapshot_date", models.DateField(auto_now_add=True)),
+                ("last_update", models.DateTimeField()),
+                (
+                    "process",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="files_consultant.process",
+                    ),
+                ),
             ],
         ),
     ]

@@ -38,8 +38,9 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
     driver.get(url)
 
     wait = WebDriverWait(driver, 10)
-    radio_buttons = wait.until(EC.presence_of_all_elements_located(
-        (By.XPATH, "//input[@role='radio']")))
+    radio_buttons = wait.until(
+        EC.presence_of_all_elements_located((By.XPATH, "//input[@role='radio']"))
+    )
 
     if len(radio_buttons) > 1:
         driver.execute_script("arguments[0].click();", radio_buttons[1])
@@ -47,8 +48,14 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
     else:
         raise Exception("Not enough radio buttons found.")
 
-    input_field = wait.until(EC.presence_of_element_located(
-        (By.XPATH, "//input[@placeholder='Ingrese los 23 dígitos del número de Radicación']")))
+    input_field = wait.until(
+        EC.presence_of_element_located(
+            (
+                By.XPATH,
+                "//input[@placeholder='Ingrese los 23 dígitos del número de Radicación']",
+            )
+        )
+    )
 
     radicado_data_list = []
 
@@ -59,10 +66,12 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
         input_field.send_keys(radicado_number)
         print(f"✅ Radicado number {radicado_number} entered successfully.")
 
-        consult_button = wait.until(EC.element_to_be_clickable(
-            (By.XPATH, "//button[@aria-label='Consultar Número de radicación']")))
-        driver.execute_script(
-            "arguments[0].scrollIntoView(true);", consult_button)
+        consult_button = wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH, "//button[@aria-label='Consultar Número de radicación']")
+            )
+        )
+        driver.execute_script("arguments[0].scrollIntoView(true);", consult_button)
         # Add a small delay to ensure the page has settled
         time.sleep(0.5)
         # Try JavaScript click if regular click fails
@@ -72,8 +81,14 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
             driver.execute_script("arguments[0].click();", consult_button)
         print("✅ 'Consult' button clicked successfully.")
 
-        table = wait.until(EC.presence_of_element_located(
-            (By.XPATH, "//th[@aria-label='Fecha de Radicación y última actuación']/ancestor::table")))
+        table = wait.until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    "//th[@aria-label='Fecha de Radicación y última actuación']/ancestor::table",
+                )
+            )
+        )
         filas = table.find_elements(By.XPATH, ".//tbody/tr")
 
         fechas_apertura = []
@@ -85,47 +100,55 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
             try:
                 # Buscar el `td` correspondiente a la columna
                 columna_fecha = fila.find_element(
-                    By.XPATH, ".//td[@class='text-center']")
+                    By.XPATH, ".//td[@class='text-center']"
+                )
 
                 # Extraer la fecha de apertura
                 fecha_apertura = columna_fecha.find_element(
-                    By.XPATH, "following-sibling::td//div").text
+                    By.XPATH, "following-sibling::td//div"
+                ).text
                 fechas_apertura.append(fecha_apertura.split("\n")[0])
 
                 # Buscar el segundo botón dentro de la fila
                 boton = columna_fecha.find_element(
-                    By.XPATH, "following-sibling::td//button")
+                    By.XPATH, "following-sibling::td//button"
+                )
                 # Extraer el span dentro del botón (contiene la fecha)
                 fecha = boton.find_element(By.XPATH, ".//span").text
                 fechas.append(fecha)
 
                 # Buscar el `td` siguiente al que contiene el botón
                 despacho_columna = boton.find_element(
-                    By.XPATH, "ancestor::td/following-sibling::td")
-                despacho = despacho_columna.find_element(
-                    By.XPATH, ".//div").text
+                    By.XPATH, "ancestor::td/following-sibling::td"
+                )
+                despacho = despacho_columna.find_element(By.XPATH, ".//div").text
                 despachos.append(despacho)
 
                 # Buscar el `td` siguiente al que contiene el despacho
                 sujeto_columna = despacho_columna.find_element(
-                    By.XPATH, "following-sibling::td")
+                    By.XPATH, "following-sibling::td"
+                )
                 sujeto = sujeto_columna.find_element(By.XPATH, ".//div").text
                 sujetos_columna.append(sujeto)
             except Exception as e:
                 print(f"⚠️ Error extrayendo fecha en una fila: {e}")
 
-        print(f"✅ Found {len(fechas_apertura)} entries for radicado number {radicado_number}.")
+        print(
+            f"✅ Found {len(fechas_apertura)} entries for radicado number {radicado_number}."
+        )
         if not fechas_apertura or not fechas or not despachos or not sujetos_columna:
             print(f"⚠️ No data found for radicado number {radicado_number}.")
             radicado_data_list.append(None)
             continue
-        
-        radicado_data_list.append(RadicadoData(
-            open_date=fechas_apertura[0],
-            last_update_date=fechas[0],
-            office=despachos[0],
-            legal_parties_str=sujetos_columna[0]
-        ))
+
+        radicado_data_list.append(
+            RadicadoData(
+                open_date=fechas_apertura[0],
+                last_update_date=fechas[0],
+                office=despachos[0],
+                legal_parties_str=sujetos_columna[0],
+            )
+        )
 
     return radicado_data_list
 
@@ -146,7 +169,7 @@ def extract_legal_parties(texto: str) -> LegalParties:
     return LegalParties(
         plaintiff=matches.get("Demandante", None),
         defendant=matches.get("Demandado", None),
-        procurator=matches.get("Procurador", None)
+        procurator=matches.get("Procurador", None),
     )
 
 
@@ -167,29 +190,38 @@ def process_radicados_from_shell(radicado_list: list[str]) -> None:
         for radicado_number, result in zip(radicado_list, results):
             if result:
                 # Create or update Process
-                process, created = files_consultant_models.Process.objects.get_or_create(
-                    file_number=radicado_number
+                process, created = (
+                    files_consultant_models.Process.objects.get_or_create(
+                        file_number=radicado_number
+                    )
                 )
 
                 # Update process data
                 process.open_date = datetime.strptime(
-                    result.open_date, '%Y-%m-%d').date()
+                    result.open_date, "%Y-%m-%d"
+                ).date()
 
                 # Extract legal parties
                 parties = extract_legal_parties(result.legal_parties_str)
-                process.plaintiff = parties.plaintiff.title() if parties.plaintiff else None
-                process.defendant = parties.defendant.title() if parties.defendant else None
-                process.procurator = parties.procurator.title() if parties.procurator else None
+                process.plaintiff = (
+                    parties.plaintiff.title() if parties.plaintiff else None
+                )
+                process.defendant = (
+                    parties.defendant.title() if parties.defendant else None
+                )
+                process.procurator = (
+                    parties.procurator.title() if parties.procurator else None
+                )
 
                 process.save()
                 print(
-                    f"✅ {'Created' if created else 'Updated'} process: {radicado_number}")
+                    f"✅ {'Created' if created else 'Updated'} process: {radicado_number}"
+                )
 
                 # Create snapshot
                 files_consultant_models.ProcessSnapshot.objects.create(
                     process=process,
-                    last_update=datetime.strptime(
-                        result.last_update_date, '%Y-%m-%d')
+                    last_update=datetime.strptime(result.last_update_date, "%Y-%m-%d"),
                 )
                 print(f"✅ Created snapshot for: {radicado_number}")
             else:

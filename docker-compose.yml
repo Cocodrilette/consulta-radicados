@@ -7,7 +7,7 @@ services:
       - .:/home/app
     working_dir: /home/app/webscraper
     ports:
-      - "8002:8000"
+      - "8010:8000"
     depends_on:
       - db
     env_file:

@@ -5,4 +5,4 @@ from rest_framework import views
 
 class ScrapeRadicados(views.APIView):
     def get(self):
-        return Response({'message': 'Scraping radicados...'})
+        return Response({"message": "Scraping radicados..."})
