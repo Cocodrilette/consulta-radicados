@@ -6,7 +6,7 @@ from files_consultant import models as files_consultant_models
 from files_consultant.utils import rama_judicial as rama_judicial_utils
 
 
-# @receiver(post_save, sender=files_consultant_models.Process)
+@receiver(post_save, sender=files_consultant_models.Process)
 def fetch_process_data(sender, instance, created, **kwargs):
     """
     Signal to fetch process data from Rama Judicial when a new Process is created

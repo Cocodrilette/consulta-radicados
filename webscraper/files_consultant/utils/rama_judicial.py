@@ -68,7 +68,7 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
         # Try JavaScript click if regular click fails
         try:
             consult_button.click()
-        except:
+        except Exception as _:
             driver.execute_script("arguments[0].click();", consult_button)
         print("✅ 'Consult' button clicked successfully.")
 
@@ -114,6 +114,12 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
             except Exception as e:
                 print(f"⚠️ Error extrayendo fecha en una fila: {e}")
 
+        print(f"✅ Found {len(fechas_apertura)} entries for radicado number {radicado_number}.")
+        if not fechas_apertura or not fechas or not despachos or not sujetos_columna:
+            print(f"⚠️ No data found for radicado number {radicado_number}.")
+            radicado_data_list.append(None)
+            continue
+        
         radicado_data_list.append(RadicadoData(
             open_date=fechas_apertura[0],
             last_update_date=fechas[0],
