@@ -46,7 +46,7 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
 
     if len(radio_buttons) > 1:
         driver.execute_script("arguments[0].click();", radio_buttons[1])
-        print("✅ Second radio button selected successfully.")
+        print("✅ Second radio button selected successfully.", flush=True)
     else:
         raise Exception("Not enough radio buttons found.")
 
@@ -62,11 +62,11 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
     radicado_data_list = []
 
     for radicado_number in radicado_numbers:
-        print(f"🔍 Searching for radicado number {radicado_number}...")
+        print(f"🔍 Searching for radicado number {radicado_number}...", flush=True)
 
         input_field.clear()
         input_field.send_keys(radicado_number)
-        print(f"✅ Radicado number {radicado_number} entered successfully.")
+        print(f"✅ Radicado number {radicado_number} entered successfully.", flush=True)
 
         consult_button = wait.until(
             EC.element_to_be_clickable(
@@ -81,7 +81,7 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
             consult_button.click()
         except Exception as _:
             driver.execute_script("arguments[0].click();", consult_button)
-        print("✅ 'Consult' button clicked successfully.")
+        print("✅ 'Consult' button clicked successfully.", flush=True)
 
         table = wait.until(
             EC.presence_of_element_located(
@@ -136,10 +136,11 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
                 print(f"⚠️ Error extrayendo fecha en una fila: {e}")
 
         print(
-            f"✅ Found {len(fechas_apertura)} entries for radicado number {radicado_number}."
+            f"✅ Found {len(fechas_apertura)} entries for radicado number {radicado_number}.",
+            flush=True,
         )
         if not fechas_apertura or not fechas or not despachos or not sujetos_columna:
-            print(f"⚠️ No data found for radicado number {radicado_number}.")
+            print(f"⚠️ No data found for radicado number {radicado_number}.", flush=True)
             radicado_data_list.append(None)
             continue
 
@@ -217,7 +218,8 @@ def process_radicados_from_shell(radicado_list: list[str]) -> None:
 
                 process.save()
                 print(
-                    f"✅ {'Created' if created else 'Updated'} process: {radicado_number}"
+                    f"✅ {'Created' if created else 'Updated'} process: {radicado_number}",
+                    flush=True,
                 )
 
                 # Create snapshot
@@ -225,11 +227,11 @@ def process_radicados_from_shell(radicado_list: list[str]) -> None:
                     process=process,
                     last_update=datetime.strptime(result.last_update_date, "%Y-%m-%d"),
                 )
-                print(f"✅ Created snapshot for: {radicado_number}")
+                print(f"✅ Created snapshot for: {radicado_number}", flush=True)
             else:
-                print(f"⚠️ No data found for: {radicado_number}")
+                print(f"⚠️ No data found for: {radicado_number}", flush=True)
 
     except Exception as e:
-        print(f"❌ Error processing radicados: {str(e)}")
+        print(f"❌ Error processing radicados: {str(e)}", flush=True)
     finally:
-        print("🔚 Closing driver...")
+        print("🔚 Closing driver...", flush=True)
