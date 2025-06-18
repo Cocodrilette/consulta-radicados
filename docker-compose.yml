@@ -2,7 +2,7 @@ services:
   web:
     build: .
     container_name: webscraper
-    command: python manage.py runserver 0:8000
+    command: daphne -p 8000 -b 0.0.0.0 consulta_radicados.asgi:application
     volumes:
       - .:/home/app
     working_dir: /home/app/webscraper
@@ -12,6 +12,8 @@ services:
       - db
     env_file:
       - .env
+    networks:
+      - consulta_radicados_network
 
   db:
     image: postgres:17
@@ -22,6 +24,26 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5440:5432"
+    networks:
+      - consulta_radicados_network
+
+  nginx:
+    restart: always
+    image: nginx:latest
+    ports:
+      - '80:80'
+    depends_on:
+      - web
+    volumes:
+      - ./nginx:/etc/nginx/conf.d # Nginx configuration
+      - ./static:/home/app/static # Static files
+      - ./media:/home/app/media # Media files
+    networks:
+      - consulta_radicados_network
+
+networks:
+  consulta_radicados_network:
+    driver: bridge
 
 volumes:
   postgres_data:

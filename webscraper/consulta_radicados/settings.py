@@ -16,23 +16,27 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+STATIC_ROOT = BASE_DIR / ".." / "static"
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-v8gv!@%qv_3k$5fl%nxq*l^juoanp=%_@)o6^bvjg8m+^fmh+9"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-v8gv!@%qv_3k$5fl%nxq*l^juoanp=%_@)o6^bvjg8m+^fmh+9"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -78,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "consulta_radicados.wsgi.application"
+ASGI_APPLICATION = "consulta_radicados.asgi.application"
 
 
 # Database

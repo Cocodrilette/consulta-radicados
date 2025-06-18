@@ -16,4 +16,6 @@ def get_driver():
     return driver
 
 
-driver = None
+def close_driver(driver):
+    if driver:
+        driver.quit()

@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from files_consultant.utils.driver import driver
+from files_consultant.utils import driver as driver_utils
 from files_consultant import models as files_consultant_models
 
 
@@ -34,6 +34,8 @@ class LegalParties:
 
 
 def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
+    driver = driver_utils.get_driver()
+
     url = "https://consultaprocesos.ramajudicial.gov.co/Procesos/NumeroRadicacion"
     driver.get(url)
 
@@ -230,8 +232,4 @@ def process_radicados_from_shell(radicado_list: list[str]) -> None:
     except Exception as e:
         print(f"❌ Error processing radicados: {str(e)}")
     finally:
-        try:
-            driver.delete_all_cookies()
-            driver.get("about:blank")
-        except:
-            pass
+        print("🔚 Closing driver...")
