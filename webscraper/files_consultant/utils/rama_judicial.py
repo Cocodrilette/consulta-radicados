@@ -155,6 +155,9 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
             )
         )
 
+    driver.quit()
+    print("🔚 Web driver closed.", flush=True)
+
     return radicado_data_list
 
 
