@@ -2,7 +2,7 @@ services:
   web:
     build: .
     container_name: webscraper
-    command: daphne -p 8000 -b 0.0.0.0 consulta_radicados.asgi:application
+    command: daphne -p 8000 -b 0.0.0.0 -t 600 consulta_radicados.asgi:application
     volumes:
       - .:/home/app
     working_dir: /home/app/webscraper
