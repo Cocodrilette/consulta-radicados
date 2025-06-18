@@ -34,8 +34,10 @@ class LegalParties:
 
 
 def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
+    print("🔍 Initializing web driver...", flush=True)
     driver = driver_utils.get_driver()
 
+    print("🔍 Navigating to the radicado consultation page...", flush=True)
     url = "https://consultaprocesos.ramajudicial.gov.co/Procesos/NumeroRadicacion"
     driver.get(url)
 
