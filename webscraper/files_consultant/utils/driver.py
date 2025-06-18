@@ -16,4 +16,4 @@ def get_driver():
     return driver
 
 
-driver = get_driver()
+driver = None
