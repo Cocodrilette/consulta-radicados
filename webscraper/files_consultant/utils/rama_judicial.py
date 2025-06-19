@@ -161,10 +161,6 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
                 radicado_data_list.append(None)
                 continue
 
-            print(
-                f"Open Date: {fechas_apertura[0]}, Last Update: {fechas[0]}, Office: {despachos[0]}, Legal Parties: {sujetos_columna[0]}",
-                flush=True,
-            )
             radicado_data_list.append(
                 RadicadoData(
                     open_date=fechas_apertura[0],
@@ -174,6 +170,9 @@ def get_radicado_data(radicado_numbers: list[str]) -> list[RadicadoData]:
                     file_number=radicado_number,
                 )
             )
+    except Exception as e:
+        print(f"❌ Error processing radicado data: {str(e)}", flush=True)
+        radicado_data_list = [None] * len(radicado_numbers)
 
     finally:
         if driver:

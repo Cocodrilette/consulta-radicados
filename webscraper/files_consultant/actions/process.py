@@ -20,6 +20,12 @@ def query_file_number(_, request, queryset: QuerySet[files_consultant_models.Pro
 
         if data_list and len(data_list) > 0:
             radicado_data = data_list[0]
+            if not radicado_data:
+                messages.error(
+                    request,
+                    f"No data found for radicado: {process_obj.file_number}",
+                )
+                continue
 
             process_obj.open_date = datetime.strptime(
                 radicado_data.open_date, "%Y-%m-%d"
