@@ -1,4 +1,5 @@
 from django.contrib import admin
+from rangefilter.filters import DateRangeFilter
 
 from files_consultant import models as files_consultant_models
 from files_consultant.actions import process as process_actions
@@ -14,8 +15,10 @@ class ProcessAdmin(admin.ModelAdmin):
         "defendant",
         "procurator",
     )
-    search_fields = ("file_number", "plaintiff", "defendant", "procurator")
-    list_filter = ("open_date",)
+    list_filter = (
+        "open_date",
+        ("open_date", DateRangeFilter),
+    )
     fieldsets = (
         (None, {"fields": ("file_number", "open_date")}),
         ("Parties", {"fields": ("plaintiff", "defendant", "procurator")}),
@@ -27,6 +30,8 @@ class ProcessAdmin(admin.ModelAdmin):
             if obj.processsnapshot_set.exists()
             else None
         )
+
+    last_update.short_description = "Última actualización"
 
     @admin.action(description="Consultar Radicado")
     def query_file_number(self, request, queryset):

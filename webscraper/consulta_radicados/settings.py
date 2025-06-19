@@ -54,6 +54,7 @@ INSTALLED_APPS += [
 
 
 INSTALLED_APPS += [
+    "rangefilter",
     "rest_framework",
 ]
 
